@@ -38,7 +38,7 @@ extras_require = {}
 
 setuptools.setup(
     name="nlp-dataset-readers",
-    version="0.1.5",
+    version="0.1.6",
     author="Riccardo Orlando",
     author_email="orlandoricc@gmail.com",
     description="Dataset Readers for NLP",
