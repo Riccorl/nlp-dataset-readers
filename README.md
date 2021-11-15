@@ -12,7 +12,7 @@ Utility for easy parsing common datasets for NLP.
 
 ## Installation
 
-From (PyPI)[https://pypi.org/project/nlp-dataset-readers/]:
+From [PyPI](https://pypi.org/project/nlp-dataset-readers):
 
 ```bash
 pip install nlp-dataset-readers
