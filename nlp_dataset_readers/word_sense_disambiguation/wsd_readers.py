@@ -5,5 +5,6 @@ from nlp_dataset_readers.common.reader import Reader
 
 
 class WsdReader(Reader):
+    @staticmethod
     def read(self, file_path: Union[str, Path], *args, **kwargs) -> Any:
         raise NotImplementedError

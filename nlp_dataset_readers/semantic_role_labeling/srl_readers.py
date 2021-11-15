@@ -11,10 +11,12 @@ from rich.progress import track
 
 
 class SrlReader(Reader):
-    def read(self, file_path: Union[str, Path], *args, **kwargs) -> Any:
+    @staticmethod
+    def read(file_path: Union[str, Path], *args, **kwargs) -> Any:
         raise NotImplementedError
 
-    def parse_sentence(self, conll_lines: Union[List[str], Any]) -> SrlSentence:
+    @staticmethod
+    def parse_sentence(conll_lines: Union[List[str], Any]) -> SrlSentence:
         raise NotImplementedError
 
     @staticmethod
@@ -48,9 +50,29 @@ class SrlReader(Reader):
                 span_tags[-1][2] = index + 1
         return span_tags
 
+    @staticmethod
+    def process_words(word: str) -> str:
+        if word == "-LRB-" or word == "-LSB-":
+            return "("
+        elif word == "-RRB-" or word == "-RSB-":
+            return ")"
+        elif word == "-LCB-":
+            return "{"
+        elif word == "-RCB-":
+            return "}"
+        elif word == "``" or word == "''":
+            return '"'
+        elif word == " ":
+            # there are parsing error in the data, where " are missing
+            # replace empty token with "
+            return '"'
+        else:
+            return word
+
 
 class Conll2012Reader(SrlReader):
-    def read(self, file_path: Union[str, Path], *args, **kwargs) -> Any:
+    @staticmethod
+    def read(file_path: Union[str, Path], *args, **kwargs) -> Any:
         """
         Read a CoNLL-2012 file and return a list of SRL sentences.
 
@@ -75,10 +97,11 @@ class Conll2012Reader(SrlReader):
             files = [file_path]
         # read all files
         for file_name in track(files, description="Reading files"):
-            parsed_sentences.extend(self.read_file(file_name))
+            parsed_sentences.extend(Conll2012Reader.read_file(file_name))
         return parsed_sentences
 
-    def read_file(self, file_name: Union[str, Path]) -> List[SrlSentence]:
+    @staticmethod
+    def read_file(file_name: Union[str, Path]) -> List[SrlSentence]:
         # output data structure
         parsed_sentences = []
         with open(file_name) as f:
@@ -90,11 +113,12 @@ class Conll2012Reader(SrlReader):
                 if line:
                     sentence.append(line)
                 else:
-                    parsed_sentences.append(self.parse_sentence(sentence))
+                    parsed_sentences.append(Conll2012Reader.parse_sentence(sentence))
                     sentence = []
         return parsed_sentences
 
-    def parse_sentence(self, conll_lines: List[str]) -> SrlSentence:
+    @staticmethod
+    def parse_sentence(conll_lines: List[str]) -> SrlSentence:
         # take the first line for some preliminary information
         conll_line = conll_lines[0].split()
         # sentence id is not unique
@@ -110,7 +134,7 @@ class Conll2012Reader(SrlReader):
         for line in conll_lines:
             conll_components = line.split()
             word = Word(
-                text=conll_components[3],
+                text=Conll2012Reader.process_words(conll_components[3]),
                 index=int(conll_components[2]),
                 lemma=conll_components[6] if conll_components[6] != "-" else None,
                 pos=conll_components[4],
@@ -150,7 +174,7 @@ class Conll2012Reader(SrlReader):
                     current_span_labels[annotation_index] = None
 
         # Now we can parse the arguments
-        argument_spans = [self.bio_to_spans(labels) for labels in span_labels]
+        argument_spans = [Conll2012Reader.bio_to_spans(labels) for labels in span_labels]
         for predicate_index, argument_span in enumerate(argument_spans):
             for role_name, start, end in argument_span:
                 if role_name == "V":
@@ -167,7 +191,8 @@ class Conll2012Reader(SrlReader):
 
 
 class Conll2009Reader(SrlReader):
-    def read(self, file_path: Union[str, Path], *args, **kwargs) -> Any:
+    @staticmethod
+    def read(file_path: Union[str, Path], *args, **kwargs) -> Any:
         """
         Read a CoNLL-2009 file and return a list of SRL sentences.
 
@@ -191,17 +216,18 @@ class Conll2009Reader(SrlReader):
                 if line:
                     sentence.append(line)
                 else:
-                    sentences.append(self.parse_sentence(sentence))
+                    sentences.append(Conll2009Reader.parse_sentence(sentence))
                     sentence = []
         return sentences
 
-    def parse_sentence(self, conll_lines: List[str]) -> SrlSentence:
+    @staticmethod
+    def parse_sentence(conll_lines: List[str]) -> SrlSentence:
         # conll 2009 doesn't have a sentence id
         sentence = SrlSentence()
         for line in conll_lines:
             line = line.split()
             word = Word(
-                text=line[1],  # line[1] is the word
+                text=Conll2009Reader.process_words(line[1]),  # line[1] is the word
                 index=int(line[0]) - 1,  # line[0] is the index, it starts at 1
                 lemma=line[2],  # line[2] is the gold lemma
                 pos=line[4],  # line[4] is the gold POS tag
@@ -242,7 +268,8 @@ class Conll2009Reader(SrlReader):
 
 
 class UnitedSrlReader(SrlReader):
-    def read(self, file_path: Union[str, Path], *args, **kwargs) -> Any:
+    @staticmethod
+    def read(file_path: Union[str, Path], *args, **kwargs) -> Any:
         """
         Read a CoNLL-U file and return a list of SRL sentences.
 
@@ -264,23 +291,22 @@ class UnitedSrlReader(SrlReader):
             ):
                 sentences.append(sentence)
         sentences = [
-            self.parse_sentence(sentence)
+            UnitedSrlReader.parse_sentence(sentence)
             for sentence in track(sentences, description="Reading file")
         ]
         return sentences
 
-    def parse_sentence(self, conll_lines: conllu.TokenList) -> SrlSentence:
+    @staticmethod
+    def parse_sentence(conll_lines: conllu.TokenList) -> SrlSentence:
         # final sentence id is a combination of document id and sentence id
         sentence = SrlSentence(
             id=f"{conll_lines.metadata['document_id']}_{conll_lines.metadata['sentence_id']}"
         )
         # Add words and predicates
         for token in conll_lines:
-            # there are parsing error in the data, where " are missing
-            # replace empty token with "
-            if token["form"] == "":
-                token["form"] = '"'
-            word = Word(token["form"], token["id"], lemma=token["lemma"])
+            word = Word(
+                UnitedSrlReader.process_words(token["form"]), token["id"], lemma=token["lemma"]
+            )
             if token["frame"] != "_":
                 word = Predicate.from_word(word, token["frame"])
             sentence.append(word)
@@ -296,7 +322,7 @@ class UnitedSrlReader(SrlReader):
             is_span = any(role.startswith("B-") for role in roles if role != "B-V")
             if is_span:
                 # convert argument to span
-                roles = self.bio_to_spans(roles)
+                roles = UnitedSrlReader.bio_to_spans(roles)
             else:
                 # threat dependency as span of length 1
                 roles = [(role, i, i + 1) for i, role in enumerate(roles) if role != "_"]
