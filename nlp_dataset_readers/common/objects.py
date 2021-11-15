@@ -42,7 +42,7 @@ class Word:
         return self.__str__()
 
 
-class Sentence:
+class Sentence(list):
     """
     A sentence class, containing a list of `Word`.
 
@@ -54,6 +54,7 @@ class Sentence:
     """
 
     def __init__(self, words: List[Word] = None, id: Any = None):
+        super(Sentence, self).__init__()
         self._words = words or []
         self.id = id
 
