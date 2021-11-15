@@ -2,7 +2,7 @@
 
 # Dataset Readers for NLP
 
-Utility for easy parsing common datasets for NLP.
+Utility for easily parsing common datasets for NLP.
 
 [![Upload to PyPi](https://github.com/Riccorl/nlp-dataset-readers/actions/workflows/python-publish-pypi.yml/badge.svg)](https://github.com/Riccorl/nlp-dataset-readers/actions/workflows/python-publish-pypi.yml)
 [![PyPi Version](https://img.shields.io/github/v/release/Riccorl/nlp-dataset-readers)](https://github.com/Riccorl/nlp-dataset-readers/releases)
@@ -30,7 +30,7 @@ pip install -e .
 
 ### Semantic Role Labeling
 
-Dataset readers for 
+Dataset readers for
 
 - [CoNLL-2009](https://ufal.mff.cuni.cz/conll2009-st/task-description.html)
 - [CoNLL-2012](https://cemantix.org/conll/2012/data.html)
@@ -38,7 +38,7 @@ Dataset readers for
 
 ### Word Sense Disambiguation
 
-Dataset readers for 
+Dataset readers for
 
 - [WSD Evaluation Framework](http://lcl.uniroma1.it/wsdeval/)
 - [XL-WSD](https://sapienzanlp.github.io/xl-wsd/)
@@ -47,8 +47,8 @@ Dataset readers for
 
 Dataset readers for
 
- - [XL-WiC]()
- - [MCL-WiC]()
+- [XL-WiC]()
+- [MCL-WiC]()
 
 ## Usage
 
