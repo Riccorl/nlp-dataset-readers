@@ -32,13 +32,13 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-install_requires = []
+install_requires = ["conllu", "rich"]
 
 extras_require = {}
 
 setuptools.setup(
     name="nlp-dataset-readers",
-    version="0.1.3",
+    version="0.1.4",
     author="Riccardo Orlando",
     author_email="orlandoricc@gmail.com",
     description="Dataset Readers for NLP",
