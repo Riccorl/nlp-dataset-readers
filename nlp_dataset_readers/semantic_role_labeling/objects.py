@@ -110,6 +110,12 @@ class Argument:
     def span(self):
         return self.start_index, self.end_index
 
+    def __str__(self):
+        return f"({self.role}, {self.start_index}, {self.end_index})"
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class SrlSentence(Sentence):
     """
