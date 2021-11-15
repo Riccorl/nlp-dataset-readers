@@ -1,6 +1,14 @@
+<div align="center">
+
 # Dataset Readers for NLP
 
 Utility for easy parsing common datasets for NLP.
+
+[![Upload to PyPi](https://github.com/Riccorl/nlp-dataset-readers/actions/workflows/python-publish-pypi.yml/badge.svg)](https://github.com/Riccorl/nlp-dataset-readers/actions/workflows/python-publish-pypi.yml)
+[![PyPi Version](https://img.shields.io/github/v/release/Riccorl/nlp-dataset-readers)](https://github.com/Riccorl/nlp-dataset-readers/releases)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000)](https://github.com/psf/black)
+
+</div>
 
 ## Installation
 
