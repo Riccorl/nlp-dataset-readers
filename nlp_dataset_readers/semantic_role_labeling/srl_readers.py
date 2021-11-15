@@ -52,6 +52,16 @@ class SrlReader(Reader):
 
     @staticmethod
     def process_word(word: str) -> str:
+        """
+        Process word.
+
+        Args:
+            word (`str`):
+                Word to preprocess.
+
+        Returns:
+            `str`: Preprocessed word.
+        """
         if word == "-LRB-" or word == "-LSB-":
             return "("
         elif word == "-RRB-" or word == "-RSB-":
@@ -102,6 +112,16 @@ class Conll2012Reader(SrlReader):
 
     @staticmethod
     def read_file(file_name: Union[str, Path]) -> List[SrlSentence]:
+        """
+        Read a single CoNLL-2012 file and return a list of SRL sentences.
+
+        Args:
+            file_name (`Union[str, Path]`):
+                Path to the CoNLL-2012 file
+
+        Returns:
+            `List[SrlSentence]`: List of SRL sentences
+        """
         # output data structure
         parsed_sentences = []
         with open(file_name) as f:
@@ -119,6 +139,16 @@ class Conll2012Reader(SrlReader):
 
     @staticmethod
     def parse_sentence(conll_lines: List[str]) -> SrlSentence:
+        """
+        Parse a single CoNLL-2012 sentence and return a SRL sentence.
+
+        Args:
+            conll_lines (`List[str]`):
+                List of CoNLL-2012 lines.
+
+        Returns:
+            `SrlSentence`: Parsed sentence with predicates and arguments.
+        """
         # take the first line for some preliminary information
         conll_line = conll_lines[0].split()
         # sentence id is not unique
@@ -222,6 +252,16 @@ class Conll2009Reader(SrlReader):
 
     @staticmethod
     def parse_sentence(conll_lines: List[str]) -> SrlSentence:
+        """
+        Parse a CoNLL-2009 sentence and return a SRL sentence.
+
+        Args:
+            conll_lines (`List[str]`):
+                List of CoNLL-2009 lines.
+
+        Returns:
+            `SrlSentence`: Parsed sentence with predicates and arguments.
+        """
         # conll 2009 doesn't have a sentence id
         sentence = SrlSentence()
         for line in conll_lines:
@@ -298,6 +338,16 @@ class UnitedSrlReader(SrlReader):
 
     @staticmethod
     def parse_sentence(conll_lines: conllu.TokenList) -> SrlSentence:
+        """
+        Parse a CoNLL-U sentence and return a SRL sentence.
+
+        Args:
+            conll_lines (`conllu.TokenList`):
+                List of CoNLL-U lines in conllu.TokenList format.
+
+        Returns:
+            `SrlSentence`: Parsed sentence with predicates and arguments.
+        """
         # final sentence id is a combination of document id and sentence id
         sentence = SrlSentence(
             id=f"{conll_lines.metadata['document_id']}_{conll_lines.metadata['sentence_id']}"
