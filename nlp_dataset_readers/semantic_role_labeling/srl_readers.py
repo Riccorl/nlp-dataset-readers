@@ -396,12 +396,16 @@ class UnitedSrlReader(SrlReader):
             for role_name, start, end in argument_span:
                 if role_name in ["B-V", "V"]:
                     continue
-                argument = Argument(
-                    role=role_name,
-                    predicate=sentence.predicates[predicate_index],
-                    words=sentence[start:end],
-                    start_index=start,
-                    end_index=end,
-                )
+                try:
+                    argument = Argument(
+                        role=role_name,
+                        predicate=sentence.predicates[predicate_index],
+                        words=sentence[start:end],
+                        start_index=start,
+                        end_index=end,
+                    )
+                except:
+                    # TODO : fix this in the dataset, it should not happen
+                    continue
                 sentence.predicates[predicate_index].add_argument(argument)
         return sentence
