@@ -110,6 +110,12 @@ class Argument:
     def span(self):
         return self.start_index, self.end_index
 
+    @property
+    def bio_tag(self):
+        bio_tags = [f"B-{self.role}"]
+        bio_tags += [f"I-{self.role}"] * (self.end_index - self.start_index - 1)
+        return bio_tags
+
     def __str__(self):
         return f"({self.role}, {self.start_index}, {self.end_index})"
 

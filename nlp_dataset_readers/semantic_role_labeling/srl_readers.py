@@ -51,6 +51,20 @@ class SrlReader(Reader):
         return span_tags
 
     @staticmethod
+    def span_to_bio(span_tags: List[List[Union[int, str]]], **kwargs) -> List[str]:
+        """
+        Convert span tags to BIO tags.
+
+        Args:
+            span_tags (`List[List[Union[int, str]]]`):
+                Span tags.
+
+        Returns:
+            `List[str]`: List of BIO tags.
+        """
+        raise NotImplementedError
+
+    @staticmethod
     def process_word(word: str) -> str:
         """
         Process word.
