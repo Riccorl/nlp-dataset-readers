@@ -51,7 +51,7 @@ class SrlReader(Reader):
         return span_tags
 
     @staticmethod
-    def process_words(word: str) -> str:
+    def process_word(word: str) -> str:
         if word == "-LRB-" or word == "-LSB-":
             return "("
         elif word == "-RRB-" or word == "-RSB-":
@@ -134,7 +134,7 @@ class Conll2012Reader(SrlReader):
         for line in conll_lines:
             conll_components = line.split()
             word = Word(
-                text=Conll2012Reader.process_words(conll_components[3]),
+                text=Conll2012Reader.process_word(conll_components[3]),
                 index=int(conll_components[2]),
                 lemma=conll_components[6] if conll_components[6] != "-" else None,
                 pos=conll_components[4],
@@ -227,7 +227,7 @@ class Conll2009Reader(SrlReader):
         for line in conll_lines:
             line = line.split()
             word = Word(
-                text=Conll2009Reader.process_words(line[1]),  # line[1] is the word
+                text=Conll2009Reader.process_word(line[1]),  # line[1] is the word
                 index=int(line[0]) - 1,  # line[0] is the index, it starts at 1
                 lemma=line[2],  # line[2] is the gold lemma
                 pos=line[4],  # line[4] is the gold POS tag
@@ -305,7 +305,7 @@ class UnitedSrlReader(SrlReader):
         # Add words and predicates
         for token in conll_lines:
             word = Word(
-                UnitedSrlReader.process_words(token["form"]), token["id"], lemma=token["lemma"]
+                UnitedSrlReader.process_word(token["form"]), token["id"], lemma=token["lemma"]
             )
             if token["frame"] != "_":
                 word = Predicate.from_word(word, token["frame"])
