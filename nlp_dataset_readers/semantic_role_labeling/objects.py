@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional, Any
 
-from common.objects import Word, Sentence
+from nlp_dataset_readers.common.objects import Word, Sentence
 
 
 @dataclass

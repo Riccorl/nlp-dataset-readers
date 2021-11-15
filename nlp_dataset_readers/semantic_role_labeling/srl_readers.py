@@ -3,9 +3,11 @@ from typing import Union, Any, List
 
 import conllu
 
-from common.objects import Word
-from common.reader import Reader
-from semantic_role_labeling.objects import Argument, Predicate, SrlSentence
+from nlp_dataset_readers.common.objects import Word
+from nlp_dataset_readers.common.reader import Reader
+from nlp_dataset_readers.semantic_role_labeling.objects import Argument, Predicate, SrlSentence
+
+from rich.progress import track
 
 
 class SrlReader(Reader):
@@ -67,11 +69,13 @@ class Conll2012Reader(SrlReader):
         file_path = Path(file_path)
         # CoNLL-2012 files are usually split into multiple files
         if file_path.is_dir():
-            for file_name in file_path.glob("**/*.gold_conll"):
-                parsed_sentences.extend(self.read_file(file_name))
+            files = list(file_path.glob("**/*.gold_conll"))
         # but it can also be a single file
         else:
-            parsed_sentences.extend(self.read_file(file_path))
+            files = [file_path]
+        # read all files
+        for file_name in track(files, description="Reading files"):
+            parsed_sentences.extend(self.read_file(file_name))
         return parsed_sentences
 
     def read_file(self, file_name: Union[str, Path]) -> List[SrlSentence]:
@@ -92,23 +96,23 @@ class Conll2012Reader(SrlReader):
 
     def parse_sentence(self, conll_lines: List[str]) -> SrlSentence:
         # take the first line for some preliminary information
-        conll_line = conll_lines[0].split("\t")
-        # get the sentence id
-        sentence = SrlSentence(id=conll_line[1])
+        conll_line = conll_lines[0].split()
+        # sentence id is not unique
+        sentence = SrlSentence()
         # empty lists to collect the SRL BIO labels
         span_labels = [[] for _ in conll_line[11:-1]]
         # Create variables representing the current label for each label
         # sequence we are collecting.
         current_span_labels = [None for _ in conll_line[11:-1]]
-        _conll_lines = [line.split("\t") for line in conll_lines]
+        _conll_lines = [line.split() for line in conll_lines]
         # read the sentence lines and build the sentence structure
         # with Words, Predicates and Arguments
         for line in conll_lines:
-            conll_components = line.split("\t")
+            conll_components = line.split()
             word = Word(
                 text=conll_components[3],
                 index=int(conll_components[2]),
-                lemma=conll_components[6] if conll_lines[6] != "-" else None,
+                lemma=conll_components[6] if conll_components[6] != "-" else None,
                 pos=conll_components[4],
             )
             # if line[6] is not "-", then the word is a predicate
@@ -258,7 +262,11 @@ class UnitedSrlReader(SrlReader):
                 fields=["id", "form", "lemma", "frame", "roles"],
                 field_parsers={"roles": lambda line, i: line[i:]},
             ):
-                sentences.append(self.parse_sentence(sentence))
+                sentences.append(sentence)
+        sentences = [
+            self.parse_sentence(sentence)
+            for sentence in track(sentences, description="Reading file")
+        ]
         return sentences
 
     def parse_sentence(self, conll_lines: conllu.TokenList) -> SrlSentence:
@@ -277,7 +285,7 @@ class UnitedSrlReader(SrlReader):
                 word = Predicate.from_word(word, token["frame"])
             sentence.append(word)
         # No arguments, early return
-        if all("roles" not in token for token in conll_lines):
+        if any("roles" not in token for token in conll_lines):
             return sentence
         # Add arguments
         roles_list = []

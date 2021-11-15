@@ -40,7 +40,7 @@ setuptools.setup(
     name="nlp-dataset-readers",
     version="0.1.0",
     author="Riccardo Orlando",
-    author_email="orlando@diag.uniroma1.it",
+    author_email="orlandoricc@gmail.com",
     description="Dataset Readers for NLP",
     long_description=long_description,
     long_description_content_type="text/markdown",
