@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Union
 
 from nlp_dataset_readers.common.objects import Word, Sentence
 
@@ -195,3 +195,34 @@ class SrlSentence(Sentence):
             `List[Predicate]`: The list of predicates.
         """
         return [p for p in self._words if isinstance(p, Predicate)]
+
+    def get_predicate_arguments(
+        self, predicate: Union[Predicate, int], format: str = "span"
+    ) -> Union[List[Argument], List[str]]:
+        """
+        Get the arguments of the given predicate.
+
+        Args:
+            predicate (`Predicate` or `int`):
+                The predicate to get the arguments of.
+            format (`str`, optional, default: `"span"`):
+                The format of the returned arguments, can be either `"span"` or `"bio"`.
+
+        Returns:
+            `List[Argument]` or `List[str]`: the arguments of the predicate.
+        """
+        if isinstance(predicate, Predicate):
+            predicate = predicate.index
+        arguments = self.get_predicate(predicate).arguments
+        if format == "span":
+            return arguments
+        elif format == "bio":
+            bio_tags = ["O"] * len(self)
+            for argument in arguments:
+                bio_tags[argument.start_index] = f"B-{argument.role}"
+                bio_tags[argument.start_index + 1 : argument.end_index] = [f"I-{argument.role}"] * (
+                    argument.end_index - argument.start_index - 1
+                )
+            return bio_tags
+        else:
+            raise ValueError(f"Unknown format: {format}. Available formats are: `span`, `bio`")
